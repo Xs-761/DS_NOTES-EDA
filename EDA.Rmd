@@ -49,11 +49,88 @@ library(patchwork)
   weather_df %>%
     count(name, month, name="n_obs")
   
+  weather_df %>%
+    group_by(month) %>%
+    summarize(
+      n_obs = n(),
+      n_days= n_distinct(date)
+    )
+  
 ```
 
+### General Summaries
+```{r}
+  weather_df %>%
+    group_by(month) %>%
+    summarize(
+      mean_tmax = mean(tmax, na.rm=TRUE),
+      mean_prcp = mean(prcp, na.rm=TRUE),
+      median_tmin=median(tmin, na.rm=TRUE)
+    )
+```
 
+```{r}
+  weather_df %>%
+    group_by(name, month) %>%
+      summarize(across(prcp:tmin, mean))
+```
 
+```{r}
+  weather_df %>%
+    group_by(name, month) %>%
+    summarize(mean_tmax=mean(tmax)) %>%
+    pivot_wider(
+        names_from = name,
+        values_from= mean_tmax
+    ) %>%
+    knitr::kable(digits=1)
+```
 
+## `group_by()` and `mutate()`
+```{r}
+  weather_df %>%
+      group_by(name) %>%
+      mutate(
+          mean_tmax = mean(tmax, na.rm=TRUE),
+          centered_tmax = tmax - mean_tmax
+      ) %>%
+          ggplot(aes(x=date,y=centered_tmax, color=name))+
+          geom_point()
+```
+
+## What about window functions?
+```{r}
+
+  weather_df %>%
+      group_by(name, month) %>%
+      mutate(temp_rank = min_rank(desc(tmax)))
+
+```
+
+lag
+```{r}
+  weather_df %>%
+      group_by(name) %>%
+      mutate(lag_temp = lag(tmax)) # by default, lag_temp contains the record obtained from tmax lagging by 1 position
+
+  weather_df %>%
+      group_by(name) %>%
+      mutate(lag_temp = lag(tmax, 5))  # you can specify to lag by N positions
+  
+  weather_df %>%
+      group_by(name) %>%
+      mutate(temp_change = tmax - lag(tmax)) # 比如，第二行 5.0-8.9=-3.9
+  
+   weather_df %>%
+        group_by(name) %>%
+        mutate(temp_change = tmax - lag(tmax)) %>%
+        summarize(
+            temp_change_max = max(temp_change, na.rm=TRUE),
+            temp_change_sd  = sd(temp_change, na.rm=TRUE)
+        )
+  
+  
+```
 
 
 
