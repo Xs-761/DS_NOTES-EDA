@@ -8,8 +8,13 @@ library(tidyverse)
 library(dplyr)
 library(ggridges)
 library(patchwork)
+
 ```
 
+```{r}
+  weather_df = read.csv("C:/Users/Twilight/Desktop/Columbia/Fall Semester 2024/Data Science I/Datasets/weather_data.csv")
+  weather_df <- weather_df %>% mutate(month = format(as.Date(date), "%m")) # creates a new column month extracted from date column
+```
 
 ### Exploratory Data Analysis
 
@@ -17,7 +22,7 @@ library(patchwork)
 * Grouping
   * Datasets often consists of groups(by design/implied/nested)
 * Quantitative comparisons across groups are informative
-  * Measures of Centrality, Variablity, Missingness
+  * Measures of Centrality, Variablity, Missingnes
 * `group_by()` + `summarize()`
   * `group_by` makes grouping explicit and adds a layer to your data
   * `summarize()` allows you to compute one-number summaries
@@ -26,6 +31,33 @@ library(patchwork)
 
 #### `group_by()`
 ```{r}
-
+  weather_df %>%
+    group_by(name, month)
 ```
+
+### counting things
+```{r}
+  weather_df %>%
+    group_by(month) %>%
+    summarize(n_obs=n())
+
+  weather_df %>%
+    group_by(name, month) %>%
+    summarize(count=n())
+  
+  # Using "count"
+  weather_df %>%
+    count(name, month, name="n_obs")
+  
+```
+
+
+
+
+
+
+
+
+
+
 
